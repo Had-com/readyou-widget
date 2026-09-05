@@ -1,6 +1,5 @@
 ﻿package com.newsfeed.widget.glance
 
-import com.newsfeed.widget.BuildConfig
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -67,6 +66,7 @@ fun FeedItemRow(
     focusedArticleId: String = "",
     focusScale: Float = AdjustFocusScaleCallback.DEFAULT_SCALE,
     focusBackgroundScale: Float = 0.5f,
+    isFocusWidget: Boolean = false,
 ) {
     val context        = LocalContext.current
     // Focus Mode only. Hoisted above isExpanded: Focus Mode has no separate expand/collapse
@@ -75,13 +75,13 @@ fun FeedItemRow(
     // its description/full-article controls instead of requiring a second, different action
     // the user has no way to trigger. Reported and confirmed: without this, Focus Mode had no
     // way at all to read an article's paragraph or full text, only to resize its headline.
-    val isFocused      = BuildConfig.FOCUS_MODE && article.id == focusedArticleId
+    val isFocused      = isFocusWidget && article.id == focusedArticleId
     val isExpanded     = article.id == expandedArticleId || isFocused
-    // Focus Mode only (BuildConfig.FOCUS_MODE — see build.gradle.kts' "focusMode" flavor).
+    // Focus widget only (isFocusWidget — see NewsFeedFocusWidget vs. NewsFeedWidget).
     // Shadows the fontSize parameter so every size derived from it below (headlineSize,
     // articleSize, thumbWidth, metaFontSize, ...) picks up the adjustment automatically, with
     // no further changes needed through the rest of this function. Inactive (focusedArticleId
-    // blank, or the standard flavor where BuildConfig.FOCUS_MODE is a compile-time false) is a
+    // blank, or a standard widget instance where isFocusWidget is false) is a
     // complete no-op — every row renders at the widget's normal configured font size, exactly
     // as before this feature existed. focusScale (the focused row's own multiplier) is live,
     // on-widget adjustable via the +/- buttons below; focusBackgroundScale (every other row)
@@ -92,7 +92,7 @@ fun FeedItemRow(
     // after) can still see the pre-focus-scale value.
     val baseFontSize = fontSize
     @Suppress("NAME_SHADOWING")
-    val fontSize = if (BuildConfig.FOCUS_MODE && focusedArticleId.isNotBlank()) {
+    val fontSize = if (isFocusWidget && focusedArticleId.isNotBlank()) {
         if (article.id == focusedArticleId) fontSize * focusScale else fontSize * focusBackgroundScale
     } else fontSize
     // The meta row (timestamp/feed name/favicon circle) uses this instead of fontSize directly.
@@ -165,8 +165,8 @@ fun FeedItemRow(
     // Focus Mode replaces expand-on-tap entirely: a tap sets/clears the focus target instead
     // (see SetFocusArticleCallback) — expanding into description text doesn't make sense
     // alongside shrinking every other row to browse by size, so this branch is checked first
-    // and, when BuildConfig.FOCUS_MODE is true, wins regardless of description content.
-    val toggleAction = if (BuildConfig.FOCUS_MODE)
+    // and, when isFocusWidget is true, wins regardless of description content.
+    val toggleAction = if (isFocusWidget)
         actionRunCallback<SetFocusArticleCallback>(
             actionParametersOf(SetFocusArticleCallback.ARTICLE_ID_KEY to article.id)
         )
