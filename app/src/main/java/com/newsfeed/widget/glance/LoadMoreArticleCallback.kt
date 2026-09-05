@@ -34,6 +34,6 @@ class LoadMoreArticleCallback : ActionCallback {
             prefs[WidgetStateKey.fullArticleShownChars] =
                 (current + FetchFullArticleCallback.CHUNK_CHARS).coerceAtMost(textLen).coerceAtMost(cap)
         }
-        NewsFeedWidget().update(context, glanceId)
+        updateNewsFeedWidget(context, glanceId)
     }
 }

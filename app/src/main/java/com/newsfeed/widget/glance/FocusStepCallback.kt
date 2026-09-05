@@ -70,6 +70,6 @@ class FocusStepCallback : ActionCallback {
             }
         }
         if (wasUnread) newFocusId?.let { ReadStatusStore(context).markRead(it) }
-        NewsFeedWidget().update(context, glanceId)
+        NewsFeedFocusWidget().update(context, glanceId)
     }
 }

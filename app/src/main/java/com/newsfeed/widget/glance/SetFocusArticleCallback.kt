@@ -53,6 +53,6 @@ class SetFocusArticleCallback : ActionCallback {
             }
         }
         if (wasUnread) ReadStatusStore(context).markRead(articleId)
-        NewsFeedWidget().update(context, glanceId)
+        NewsFeedFocusWidget().update(context, glanceId)
     }
 }

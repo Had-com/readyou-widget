@@ -59,7 +59,7 @@ class FetchFullArticleCallback : ActionCallback {
                 prefs[WidgetStateKey.fullArticleText]        = description
                 prefs[WidgetStateKey.fullArticleShownChars]  = CHUNK_CHARS
             }
-            NewsFeedWidget().update(context, glanceId)
+            updateNewsFeedWidget(context, glanceId)
         }
 
         // Fetch the full article in the background; update again when done
@@ -69,7 +69,7 @@ class FetchFullArticleCallback : ActionCallback {
             prefs[WidgetStateKey.fullArticleId]   = articleId
             prefs[WidgetStateKey.fullArticleText] = content
         }
-        NewsFeedWidget().update(context, glanceId)
+        updateNewsFeedWidget(context, glanceId)
     }
 
     private fun fetchContent(url: String): String {

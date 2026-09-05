@@ -80,6 +80,8 @@ import com.newsfeed.widget.data.WidgetConfig
 import com.newsfeed.widget.data.WidgetConfigStore
 import com.newsfeed.widget.data.WidgetStateKey
 import com.newsfeed.widget.glance.NewsFeedWidget
+import com.newsfeed.widget.glance.NewsFeedFocusWidget
+import com.newsfeed.widget.glance.updateNewsFeedWidget
 import com.newsfeed.widget.glance.WidgetThemes
 import com.newsfeed.widget.glance.WidgetWorker
 import com.newsfeed.widget.update.UpdateManager
@@ -349,10 +351,15 @@ class WidgetConfigActivity : ComponentActivity() {
                                             updateAppWidgetState(this@WidgetConfigActivity, glanceId) { prefs ->
                                                 prefs[WidgetStateKey.configJson] = Json.encodeToString(final)
                                             }
-                                            // update() initialises the Glance DataStore subscription;
-                                            // updateAll() ensures every widget instance re-renders.
-                                            NewsFeedWidget().update(this@WidgetConfigActivity, glanceId)
+                                            // updateNewsFeedWidget() initialises the Glance DataStore
+                                            // subscription for whichever widget type this instance
+                                            // actually is; updateAll() on both classes ensures every
+                                            // placed widget of either type re-renders (matches the
+                                            // existing "refresh everything, not just this one"
+                                            // behavior from before two widget types existed).
+                                            updateNewsFeedWidget(this@WidgetConfigActivity, glanceId)
                                             NewsFeedWidget().updateAll(this@WidgetConfigActivity)
+                                            NewsFeedFocusWidget().updateAll(this@WidgetConfigActivity)
                                         }
                                         WidgetWorker.refreshNow(this@WidgetConfigActivity)
                                         setResult(RESULT_OK, Intent().apply { putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId) })

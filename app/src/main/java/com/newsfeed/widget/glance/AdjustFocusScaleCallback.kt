@@ -46,6 +46,6 @@ class AdjustFocusScaleCallback : ActionCallback {
             val current = prefs[WidgetStateKey.focusScale] ?: DEFAULT_SCALE
             prefs[WidgetStateKey.focusScale] = (current + delta).coerceIn(MIN_SCALE, MAX_SCALE)
         }
-        NewsFeedWidget().update(context, glanceId)
+        NewsFeedFocusWidget().update(context, glanceId)
     }
 }

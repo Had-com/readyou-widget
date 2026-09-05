@@ -22,6 +22,6 @@ class ClearFocusCallback : ActionCallback {
         updateAppWidgetState(context, glanceId) { prefs ->
             prefs[WidgetStateKey.focusedArticleId] = ""
         }
-        NewsFeedWidget().update(context, glanceId)
+        NewsFeedFocusWidget().update(context, glanceId)
     }
 }

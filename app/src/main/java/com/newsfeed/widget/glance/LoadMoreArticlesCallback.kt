@@ -31,6 +31,6 @@ class LoadMoreArticlesCallback : ActionCallback {
             val current = prefs[WidgetStateKey.visibleArticleCount] ?: ARTICLE_CHUNK_SIZE
             prefs[WidgetStateKey.visibleArticleCount] = current + ARTICLE_CHUNK_SIZE
         }
-        NewsFeedWidget().update(context, glanceId)
+        updateNewsFeedWidget(context, glanceId)
     }
 }
