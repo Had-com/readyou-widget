@@ -99,6 +99,20 @@ class WidgetWorker(
             )
         }
 
+        // Ensures the periodic refresh job exists WITHOUT disturbing an already-configured
+        // interval — used by onEnabled()/BootReceiver call sites, which fire whenever the
+        // first widget of EITHER type is (re-)enabled and have no idea what interval, if
+        // any, is already correctly running because of the OTHER widget type or a prior
+        // Settings save. schedule() above intentionally stays REPLACE-based for
+        // WidgetConfigActivity's Save handler, which DOES know the real, just-chosen
+        // interval and must apply it even if a job's already running.
+        fun ensureScheduled(context: Context) {
+            val request = PeriodicWorkRequestBuilder<WidgetWorker>(15, TimeUnit.MINUTES).build()
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, request,
+            )
+        }
+
         fun refreshNow(context: Context) {
             WorkManager.getInstance(context)
                 .enqueue(OneTimeWorkRequestBuilder<WidgetWorker>().build())

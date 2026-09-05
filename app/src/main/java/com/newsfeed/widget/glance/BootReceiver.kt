@@ -28,7 +28,7 @@ class BootReceiver : BroadcastReceiver() {
                 // widget was removed and re-added. Fixed as part of making this
                 // multi-widget-aware anyway.
                 if (standardIds.isNotEmpty() || focusIds.isNotEmpty()) {
-                    WidgetWorker.schedule(context)
+                    WidgetWorker.ensureScheduled(context)
                     UpdateCheckWorker.schedule(context)
                 }
             } finally {

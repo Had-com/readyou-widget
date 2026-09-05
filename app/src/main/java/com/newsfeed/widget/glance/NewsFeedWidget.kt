@@ -580,7 +580,7 @@ class NewsFeedWidgetReceiver : GlanceAppWidgetReceiver() {
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        WidgetWorker.schedule(context)
+        WidgetWorker.ensureScheduled(context)
         UpdateCheckWorker.schedule(context)
         scheduleClockTick(context)
     }
@@ -651,7 +651,7 @@ class NewsFeedFocusWidgetReceiver : GlanceAppWidgetReceiver() {
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        WidgetWorker.schedule(context)
+        WidgetWorker.ensureScheduled(context)
         UpdateCheckWorker.schedule(context)
         scheduleClockTick(context)
     }
