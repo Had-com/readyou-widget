@@ -52,26 +52,6 @@ android {
         buildConfig = true
     }
 
-    // "focusMode" is a separate, side-by-side-installable app (different applicationId) for
-    // testing the tap-to-focus / shrink-the-rest browsing idea before deciding whether to fold
-    // it into the real app. Same codebase, gated behind BuildConfig.FOCUS_MODE — see
-    // FeedItemRow.kt's fontSize shadowing, FocusStepCallback, and NewsFeedWidget.kt's header
-    // step buttons. "standard" keeps the existing applicationId/behavior completely unchanged,
-    // so nothing about the shipped app's identity or install changes because this dimension
-    // exists.
-    flavorDimensions += "variant"
-    productFlavors {
-        create("standard") {
-            dimension = "variant"
-            buildConfigField("boolean", "FOCUS_MODE", "false")
-        }
-        create("focusMode") {
-            dimension = "variant"
-            applicationIdSuffix = ".focus"
-            versionNameSuffix = "-focus"
-            buildConfigField("boolean", "FOCUS_MODE", "true")
-        }
-    }
 }
 
 dependencies {

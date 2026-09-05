@@ -81,6 +81,7 @@ import com.newsfeed.widget.data.WidgetConfigStore
 import com.newsfeed.widget.data.WidgetStateKey
 import com.newsfeed.widget.glance.NewsFeedWidget
 import com.newsfeed.widget.glance.NewsFeedFocusWidget
+import com.newsfeed.widget.glance.NewsFeedFocusWidgetReceiver
 import com.newsfeed.widget.glance.updateNewsFeedWidget
 import com.newsfeed.widget.glance.WidgetThemes
 import com.newsfeed.widget.glance.WidgetWorker
@@ -114,6 +115,14 @@ class WidgetConfigActivity : ComponentActivity() {
         if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             setResult(RESULT_CANCELED); finish(); return
         }
+
+        // Which widget type THIS specific instance is — determined by which receiver it's
+        // actually registered to, not a compile-time flag, now that both widget types live
+        // in one app. Computed once here (not inside the Composable below) since it never
+        // changes for the lifetime of this screen.
+        val isFocusWidget = AppWidgetManager.getInstance(this)
+            .getAppWidgetInfo(appWidgetId)?.provider
+            ?.className == NewsFeedFocusWidgetReceiver::class.java.name
 
         val store = WidgetConfigStore(this)
         val repo  = NewsFeedRepository(this)
@@ -494,7 +503,7 @@ class WidgetConfigActivity : ComponentActivity() {
                                 // row's own size, which is a live, on-widget +/- adjustment
                                 // (AdjustFocusScaleCallback) because that's meant to be tuned
                                 // per article in the moment, not set once in advance.
-                                if (BuildConfig.FOCUS_MODE) {
+                                if (isFocusWidget) {
                                     Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                                         Text("Background rows size", style = MaterialTheme.typography.bodyMedium)
                                         Text("${(config.focusBackgroundScale * 100).toInt()}%", fontSize = 13.sp,

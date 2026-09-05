@@ -3,6 +3,7 @@
     <string name="app_name">NewsFeed</string>
     <string name="widget_description">Displays your RSS feeds with per-feed customization</string>
     <string name="widget_label">NewsFeed</string>
+    <string name="widget_label_focus">NewsFeed Focus</string>
 
     <string name="sort_newest">Newest first</string>
     <string name="sort_oldest">Oldest first</string>

@@ -29,6 +29,19 @@
         </receiver>
 
         <receiver
+            android:name=".glance.NewsFeedFocusWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_label_focus">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.newsfeed.widget.CLOCK_TICK_FOCUS" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/appwidget_info_focus" />
+        </receiver>
+
+        <receiver
             android:name=".glance.BootReceiver"
             android:exported="true">
             <intent-filter>

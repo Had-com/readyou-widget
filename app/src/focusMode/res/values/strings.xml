@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Overrides src/main's app_name/widget_label for this flavor only, so the focus-mode
-         test build shows up as a clearly distinct entry in the widget picker, installable
-         side by side with the real NewsFeed app (different applicationId, see build.gradle.kts). -->
-    <string name="app_name">NewsFeed Focus</string>
-    <string name="widget_label">NewsFeed Focus</string>
-</resources>

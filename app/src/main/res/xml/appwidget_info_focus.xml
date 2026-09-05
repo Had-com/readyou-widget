@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_description"
+    android:minWidth="250dp"
+    android:minHeight="200dp"
+    android:maxResizeWidth="500dp"
+    android:maxResizeHeight="600dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="4"
+    android:minResizeWidth="130dp"
+    android:minResizeHeight="200dp"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen"
+    android:configure="com.newsfeed.widget.config.WidgetConfigActivity"
+    android:resizeMode="horizontal|vertical"
+    android:widgetFeatures="reconfigurable" />
