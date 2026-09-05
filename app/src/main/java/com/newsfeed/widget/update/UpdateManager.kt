@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit
 object UpdateManager {
     private const val RELEASE_BASE = "https://github.com/Had-com/NewsFeed-widget/releases/download/latest"
     private const val VERSION_JSON_URL = "$RELEASE_BASE/version.json"
+    private const val APK_URL = "$RELEASE_BASE/NewsFeed-latest.apk"
     private const val CHANNEL_ID = "update_available"
     private const val NOTIFICATION_ID = 1001
 
@@ -46,9 +47,6 @@ object UpdateManager {
         .connectTimeout(8, TimeUnit.SECONDS)
         .readTimeout(20, TimeUnit.SECONDS)
         .build()
-
-    private fun apkUrlForThisFlavor(): String =
-        "$RELEASE_BASE/NewsFeed-${BuildConfig.FLAVOR}-latest.apk"
 
     suspend fun checkAndUpdate(context: Context, notifyOnly: Boolean) {
         val latestVersionCode = withContext(Dispatchers.IO) { fetchLatestVersionCode() }
@@ -104,7 +102,7 @@ object UpdateManager {
     }
 
     private fun downloadApk(context: Context): File? = try {
-        val request = Request.Builder().url(apkUrlForThisFlavor()).build()
+        val request = Request.Builder().url(APK_URL).build()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) return null
             val body = response.body ?: return null
