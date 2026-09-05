@@ -107,7 +107,7 @@ object UpdateManager {
             if (!response.isSuccessful) return null
             val body = response.body ?: return null
             val dir = File(context.cacheDir, "updates").apply { mkdirs() }
-            val file = File(dir, "update-${BuildConfig.FLAVOR}.apk")
+            val file = File(dir, "update.apk")
             body.byteStream().use { input ->
                 file.outputStream().use { output -> input.copyTo(output) }
             }
