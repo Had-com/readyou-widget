@@ -587,8 +587,18 @@ class NewsFeedWidgetReceiver : GlanceAppWidgetReceiver() {
 
     override fun onDisabled(context: Context) {
         super.onDisabled(context)
-        WidgetWorker.cancel(context)
-        UpdateCheckWorker.cancel(context)
+        // Two receivers now share WidgetWorker/UpdateCheckWorker's periodic jobs (one per
+        // app, not per widget type) — Android calls onDisabled() when THIS receiver's own
+        // widget count hits zero, not when every widget in the app is gone. Cancelling the
+        // shared jobs unconditionally here would kill background refresh/update-checking for
+        // a still-placed Focus widget the moment the last standard widget is removed.
+        val focusWidgetsRemain = AppWidgetManager.getInstance(context)
+            .getAppWidgetIds(ComponentName(context, NewsFeedFocusWidgetReceiver::class.java))
+            .isNotEmpty()
+        if (!focusWidgetsRemain) {
+            WidgetWorker.cancel(context)
+            UpdateCheckWorker.cancel(context)
+        }
         cancelClockTick(context)
     }
 
@@ -624,6 +634,72 @@ class NewsFeedWidgetReceiver : GlanceAppWidgetReceiver() {
         private fun clockPi(context: Context) = PendingIntent.getBroadcast(
             context, RC_CLOCK,
             Intent(ACTION_CLOCK_TICK, null, context, NewsFeedWidgetReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+}
+
+/**
+ * The Focus widget's receiver — same shape as NewsFeedWidgetReceiver: shares
+ * WidgetWorker/UpdateCheckWorker's periodic jobs, guarded the same way against cancelling
+ * them while the OTHER widget type is still placed; its own independent CLOCK_TICK alarm
+ * under a distinct action string and request code so the two receivers' PendingIntents never
+ * collide.
+ */
+class NewsFeedFocusWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget = NewsFeedFocusWidget()
+
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        WidgetWorker.schedule(context)
+        UpdateCheckWorker.schedule(context)
+        scheduleClockTick(context)
+    }
+
+    override fun onDisabled(context: Context) {
+        super.onDisabled(context)
+        val standardWidgetsRemain = AppWidgetManager.getInstance(context)
+            .getAppWidgetIds(ComponentName(context, NewsFeedWidgetReceiver::class.java))
+            .isNotEmpty()
+        if (!standardWidgetsRemain) {
+            WidgetWorker.cancel(context)
+            UpdateCheckWorker.cancel(context)
+        }
+        cancelClockTick(context)
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        if (intent.action == ACTION_CLOCK_TICK) {
+            val pending = goAsync()
+            MainScope().launch {
+                try { NewsFeedFocusWidget().updateAll(context) }
+                finally { pending.finish() }
+            }
+            scheduleClockTick(context)
+        }
+    }
+
+    companion object {
+        const val ACTION_CLOCK_TICK = "com.newsfeed.widget.CLOCK_TICK_FOCUS"
+        private const val RC_CLOCK  = 1002
+
+        fun scheduleClockTick(context: Context) {
+            val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            am.setAndAllowWhileIdle(
+                AlarmManager.RTC,
+                System.currentTimeMillis() + 60_000L,
+                clockPi(context),
+            )
+        }
+
+        private fun cancelClockTick(context: Context) {
+            (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager).cancel(clockPi(context))
+        }
+
+        private fun clockPi(context: Context) = PendingIntent.getBroadcast(
+            context, RC_CLOCK,
+            Intent(ACTION_CLOCK_TICK, null, context, NewsFeedFocusWidgetReceiver::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
